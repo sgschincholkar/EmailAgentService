@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #12141a; }
+    a { color: #e8a33d; } a:hover { color: #f4b95a; }
+    .serif { font-family: 'Source Serif 4', Georgia, serif; }
+    input, textarea, select { font-family: 'Inter', system-ui, sans-serif; }
+    ::placeholder { color: #565b6b; }
+  </style>
+</helmet>
+<div style="width: 520px; min-height: 760px; background: #1a1d26; box-sizing: border-box; display: flex; flex-direction: column;">
+
+  <div style="padding: 28px 32px 0;">
+    <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+      <div style="flex: 1; height: 3px; border-radius: 2px; background: {{step1Color}};"></div>
+      <div style="flex: 1; height: 3px; border-radius: 2px; background: {{step2Color}};"></div>
+      <div style="flex: 1; height: 3px; border-radius: 2px; background: {{step3Color}};"></div>
+    </div>
+  </div>
+
+  <sc-if value="{{isStep1}}" hint-placeholder-val="{{true}}">
+  <div style="display: flex; flex-direction: column; flex: 1;">
+    <div style="padding: 4px 32px 24px;">
+      <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #e8a33d; margin-bottom: 6px; font-weight: 600;">Studio Precision</div>
+      <div class="serif" style="font-size: 24px; color: #f2f0eb;">Brand Kit</div>
+      <div style="font-size: 13px; color: #8b8f9c; margin-top: 4px;">Step 1 of 3</div>
+    </div>
+    <div style="padding: 4px 32px; display: flex; flex-direction: column; gap: 20px; flex: 1;">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-size: 13px; color: #b8bcc8;">Logo</label>
+        <div style="border: 1px dashed #3a3f4e; border-radius: 4px; padding: 22px; text-align: center; color: #6b7080; font-size: 13px;">Upload logo</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-size: 13px; color: #b8bcc8;">Brand colors</label>
+        <div style="display: flex; gap: 10px;">
+          <div style="width: 40px; height: 40px; border-radius: 4px; background: #e8a33d; border: 1px solid #3a3f4e;"></div>
+          <div style="width: 40px; height: 40px; border-radius: 4px; background: #1a1d26; border: 1px solid #3a3f4e;"></div>
+          <div style="width: 40px; height: 40px; border-radius: 4px; background: #f2f0eb; border: 1px solid #3a3f4e;"></div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-size: 13px; color: #b8bcc8;">Font pairing</label>
+        <input type="text" value="{{fontPairing}}" onChange="{{setFontPairing}}" placeholder="e.g. Source Serif 4 / Inter" style="background: #12141a; border: 1px solid #3a3f4e; border-radius: 4px; padding: 10px 12px; color: #f2f0eb; font-size: 14px;">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-size: 13px; color: #b8bcc8;">Tone of voice</label>
+        <textarea value="{{tone}}" onChange="{{setTone}}" placeholder="Confident, direct, no corporate filler..." style="background: #12141a; border: 1px solid #3a3f4e; border-radius: 4px; padding: 10px 12px; color: #f2f0eb; font-size: 14px; min-height: 64px; resize: none;"></textarea>
+      </div>
+    </div>
+    <div style="padding: 24px 32px; border-top: 1px solid #2a2e3a; display: flex; justify-content: flex-end;">
+      <button onClick="{{goStep2}}" style="background: #e8a33d; color: #1a1d26; border: none; border-radius: 4px; padding: 11px 24px; font-size: 14px; font-weight: 600; cursor: pointer;">Next →</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{isStep2}}" hint-placeholder-val="{{false}}">
+  <div style="display: flex; flex-direction: column; flex: 1;">
+    <div style="padding: 4px 32px 24px;">
+      <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #e8a33d; margin-bottom: 6px; font-weight: 600;">Studio Precision</div>
+      <div class="serif" style="font-size: 24px; color: #f2f0eb;">Segment &amp; Brief</div>
+      <div style="font-size: 13px; color: #8b8f9c; margin-top: 4px;">Step 2 of 3</div>
+    </div>
+    <div style="padding: 4px 32px; display: flex; flex-direction: column; gap: 20px; flex: 1;">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-size: 13px; color: #b8bcc8;">Segment</label>
+        <select value="{{segment}}" onChange="{{setSegment}}" style="background: #12141a; border: 1px solid #3a3f4e; border-radius: 4px; padding: 10px 12px; color: #f2f0eb; font-size: 14px;">
+          <option value="new">New users</option>
+          <option value="churned">Churned users</option>
+          <option value="vip">VIP customers</option>
+        </select>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-size: 13px; color: #b8bcc8;">Campaign brief</label>
+        <textarea value="{{brief}}" onChange="{{setBrief}}" placeholder="Goal, key message, offer..." style="background: #12141a; border: 1px solid #3a3f4e; border-radius: 4px; padding: 10px 12px; color: #f2f0eb; font-size: 14px; min-height: 90px; resize: none;"></textarea>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-size: 13px; color: #b8bcc8;">Images</label>
+        <div style="border: 1px dashed #3a3f4e; border-radius: 4px; padding: 22px; text-align: center; color: #6b7080; font-size: 13px;">Upload 1–3 images</div>
+      </div>
+    </div>
+    <div style="padding: 24px 32px; border-top: 1px solid #2a2e3a; display: flex; justify-content: space-between;">
+      <button onClick="{{goStep1}}" style="background: transparent; color: #b8bcc8; border: 1px solid #3a3f4e; border-radius: 4px; padding: 11px 20px; font-size: 14px; font-weight: 500; cursor: pointer;">← Back</button>
+      <button onClick="{{goStep3}}" style="background: #e8a33d; color: #1a1d26; border: none; border-radius: 4px; padding: 11px 24px; font-size: 14px; font-weight: 600; cursor: pointer;">Generate →</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{isStep3}}" hint-placeholder-val="{{false}}">
+  <div style="display: flex; flex-direction: column; flex: 1;">
+    <div style="padding: 4px 32px 20px;">
+      <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #e8a33d; margin-bottom: 6px; font-weight: 600;">Studio Precision</div>
+      <div class="serif" style="font-size: 24px; color: #f2f0eb;">Result</div>
+      <div style="font-size: 13px; color: #8b8f9c; margin-top: 4px;">Step 3 of 3</div>
+    </div>
+    <div style="padding: 4px 32px; display: flex; flex-direction: column; gap: 16px; flex: 1;">
+      <div style="background: #21252f; border: 1px solid #333949; border-radius: 4px; padding: 14px 16px; display: flex; gap: 10px; align-items: flex-start;">
+        <div style="width: 18px; height: 18px; border-radius: 50%; background: #5fae72; flex-shrink: 0; margin-top: 2px;"></div>
+        <div>
+          <div style="font-size: 13px; color: #d8f0dd; font-weight: 600;">Self-check passed</div>
+          <div style="font-size: 12px; color: #8b8f9c; margin-top: 2px;">Copy tone matches brand voice; template fits brief intent.</div>
+        </div>
+      </div>
+      <div style="background: #f2f0eb; border-radius: 4px; padding: 20px; display: flex; flex-direction: column; gap: 12px; min-height: 260px;">
+        <div style="width: 100%; height: 100px; background: #e8a33d; border-radius: 3px; display: flex; align-items: center; justify-content: center; color: #1a1d26; font-size: 12px; font-weight: 600;">[ uploaded image ]</div>
+        <div class="serif" style="font-size: 17px; color: #1a1a1a; font-weight: 600;">Sample subject line</div>
+        <div style="font-size: 13px; color: #444; line-height: 1.5;">Sample generated body copy reflecting the brand tone and campaign brief goes here.</div>
+        <div style="align-self: flex-start; background: #1a1d26; color: #f2f0eb; font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 3px;">Sample CTA</div>
+      </div>
+    </div>
+    <div style="padding: 24px 32px; border-top: 1px solid #2a2e3a; display: flex; justify-content: space-between;">
+      <button onClick="{{goStep2}}" style="background: transparent; color: #b8bcc8; border: 1px solid #3a3f4e; border-radius: 4px; padding: 11px 20px; font-size: 14px; font-weight: 500; cursor: pointer;">← Back</button>
+      <button style="background: #e8a33d; color: #1a1d26; border: none; border-radius: 4px; padding: 11px 24px; font-size: 14px; font-weight: 600; cursor: pointer;">Copy HTML</button>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const step = this.state.step ?? 1;
+    const fontPairing = this.state.fontPairing ?? '';
+    const tone = this.state.tone ?? '';
+    const segment = this.state.segment ?? 'new';
+    const brief = this.state.brief ?? '';
+    return {
+      isStep1: step === 1,
+      isStep2: step === 2,
+      isStep3: step === 3,
+      step1Color: step >= 1 ? '#e8a33d' : '#2a2e3a',
+      step2Color: step >= 2 ? '#e8a33d' : '#2a2e3a',
+      step3Color: step >= 3 ? '#e8a33d' : '#2a2e3a',
+      fontPairing,
+      tone,
+      segment,
+      brief,
+      setFontPairing: (e) => this.setState({ fontPairing: e.target.value }),
+      setTone: (e) => this.setState({ tone: e.target.value }),
+      setSegment: (e) => this.setState({ segment: e.target.value }),
+      setBrief: (e) => this.setState({ brief: e.target.value }),
+      goStep1: () => this.setState({ step: 1 }),
+      goStep2: () => this.setState({ step: 2 }),
+      goStep3: () => this.setState({ step: 3 }),
+    };
+  }
+}
+</script>
+</body>
+</html>

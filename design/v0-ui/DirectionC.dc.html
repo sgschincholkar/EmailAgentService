@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Archivo', system-ui, sans-serif; background: #b8ad8f; }
+    a { color: #5c6b4f; } a:hover { color: #4a5740; }
+  </style>
+</helmet>
+<div style="width: 480px; min-height: 720px; background: #c9c0a4; box-sizing: border-box; display: flex; flex-direction: column;">
+  <div style="padding: 32px 32px 24px; border-bottom: 1px solid #a99c7d;">
+    <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #5c6b4f; margin-bottom: 6px; font-weight: 600;">Muted Earth</div>
+    <div style="font-size: 22px; color: #33301f; font-weight: 700;">Brand Kit</div>
+    <div style="font-size: 13px; color: #6b6248; margin-top: 4px;">Step 1 of 3</div>
+  </div>
+  <div style="padding: 28px 32px; display: flex; flex-direction: column; gap: 22px; flex: 1;">
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <label style="font-size: 13px; color: #4a4530; font-weight: 500;">Logo</label>
+      <div style="border: 1px dashed #a99c7d; border-radius: 3px; padding: 24px; text-align: center; color: #7a7057; font-size: 13px;">Upload logo</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <label style="font-size: 13px; color: #4a4530; font-weight: 500;">Brand colors</label>
+      <div style="display: flex; gap: 10px;">
+        <div style="width: 40px; height: 40px; border-radius: 3px; background: #6b7a52; border: 1px solid #a99c7d;"></div>
+        <div style="width: 40px; height: 40px; border-radius: 3px; background: #8a7355; border: 1px solid #a99c7d;"></div>
+        <div style="width: 40px; height: 40px; border-radius: 3px; background: #33301f; border: 1px solid #a99c7d;"></div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <label style="font-size: 13px; color: #4a4530; font-weight: 500;">Font pairing</label>
+      <input type="text" placeholder="e.g. Archivo / Archivo" style="background: #ded7c1; border: 1px solid #a99c7d; border-radius: 3px; padding: 10px 12px; color: #33301f; font-size: 14px;">
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <label style="font-size: 13px; color: #4a4530; font-weight: 500;">Tone of voice</label>
+      <textarea placeholder="Grounded, plain-spoken, no gloss..." style="background: #ded7c1; border: 1px solid #a99c7d; border-radius: 3px; padding: 10px 12px; color: #33301f; font-size: 14px; min-height: 70px; resize: none;"></textarea>
+    </div>
+  </div>
+  <div style="padding: 24px 32px; border-top: 1px solid #a99c7d; display: flex; justify-content: flex-end;">
+    <button style="background: #5c6b4f; color: #f2eee0; border: none; border-radius: 3px; padding: 11px 24px; font-size: 14px; font-weight: 600; cursor: pointer;">Next →</button>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
