@@ -53,14 +53,42 @@ const baseDocument: EmailDocument = {
   updatedAt: "2026-09-04T06:00:00.000Z",
 };
 
+const imageDocument: EmailDocument = {
+  ...baseDocument,
+  layoutId: "hero_cta",
+  blocks: [
+    {
+      id: "hero_image",
+      type: "image",
+      assetId: "asset-old",
+      altText: "Original alt text",
+      editable: true,
+      lockedForVariants: false,
+    },
+    ...baseDocument.blocks,
+  ],
+};
+
 const push = vi.fn();
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push, refresh: vi.fn() }),
 }));
 
+const uploadAssetMock = vi.fn();
+vi.mock("@/components/asset/upload-asset", async () => {
+  const actual = await vi.importActual<typeof import("@/components/asset/upload-asset")>(
+    "@/components/asset/upload-asset",
+  );
+  return {
+    ...actual,
+    uploadAsset: (...args: Parameters<typeof actual.uploadAsset>) => uploadAssetMock(...args),
+  };
+});
+
 afterEach(() => {
   vi.unstubAllGlobals();
   push.mockClear();
+  uploadAssetMock.mockClear();
 });
 
 describe("EditDraftPanel", () => {
@@ -210,6 +238,71 @@ describe("EditDraftPanel", () => {
     expect((screen.getByLabelText("Button destination URL") as HTMLInputElement).value).toBe(
       "javascript:alert(1)",
     );
+    expect(push).not.toHaveBeenCalled();
+  });
+
+  it("shows a Replace image control only when the layout has an image slot", () => {
+    render(<EditDraftPanel campaignId="campaign-1" document={baseDocument} />);
+    expect(screen.queryByLabelText("Replace image")).toBeNull();
+
+    render(<EditDraftPanel campaignId="campaign-1" document={imageDocument} />);
+    expect(screen.getByLabelText("Replace image")).toBeTruthy();
+  });
+
+  it("uploads the file and navigates to the new version on a successful replace", async () => {
+    uploadAssetMock.mockResolvedValue({ id: "asset-new" });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ documentId: "doc-2", version: 3 }), { status: 201 }),
+      ),
+    );
+
+    render(<EditDraftPanel campaignId="campaign-1" document={imageDocument} />);
+    const file = new File(["fake"], "new-hero.png", { type: "image/png" });
+    fireEvent.change(screen.getByLabelText("Replace image"), { target: { files: [file] } });
+
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/campaigns/campaign-1/preview?version=3"));
+    expect(uploadAssetMock).toHaveBeenCalledWith(file, "campaign_image");
+  });
+
+  it("shows an error without navigating when replace-image fails", async () => {
+    uploadAssetMock.mockResolvedValue({ id: "asset-new" });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ error: "This is already the current image." }), {
+          status: 400,
+        }),
+      ),
+    );
+
+    render(<EditDraftPanel campaignId="campaign-1" document={imageDocument} />);
+    const file = new File(["fake"], "new-hero.png", { type: "image/png" });
+    fireEvent.change(screen.getByLabelText("Replace image"), { target: { files: [file] } });
+
+    await waitFor(() =>
+      expect(screen.getByText("This is already the current image.")).toBeTruthy(),
+    );
+    expect(push).not.toHaveBeenCalled();
+  });
+
+  it("shows a conflict message without navigating on a 409 during replace-image", async () => {
+    uploadAssetMock.mockResolvedValue({ id: "asset-new" });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ error: "Newer version exists.", latestVersion: 5 }), {
+          status: 409,
+        }),
+      ),
+    );
+
+    render(<EditDraftPanel campaignId="campaign-1" document={imageDocument} />);
+    const file = new File(["fake"], "new-hero.png", { type: "image/png" });
+    fireEvent.change(screen.getByLabelText("Replace image"), { target: { files: [file] } });
+
+    await waitFor(() => expect(screen.getByText(/v5/)).toBeTruthy());
     expect(push).not.toHaveBeenCalled();
   });
 });

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { uploadAsset, UploadAssetError } from "@/components/asset/upload-asset";
 import { LAYOUT_SLOTS } from "@/renderer/layout-slots";
 import type { EmailDocument, LayoutId } from "@/domain/schemas";
 
@@ -57,6 +58,9 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
 
   const [regeneratingBlockId, setRegeneratingBlockId] = useState<string | null>(null);
   const [regenerateError, setRegenerateError] = useState<string | null>(null);
+
+  const [replacingImage, setReplacingImage] = useState(false);
+  const [replaceImageError, setReplaceImageError] = useState<string | null>(null);
 
   function buildEdits() {
     const edits: Array<
@@ -145,6 +149,44 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
   function handleReloadLatest() {
     router.push(`/campaigns/${campaignId}/preview`);
     router.refresh();
+  }
+
+  async function handleReplaceImage(file: File) {
+    setReplaceImageError(null);
+    setConflict(null);
+    setSuccessMessage(null);
+    setReplacingImage(true);
+    try {
+      const asset = await uploadAsset(file, "campaign_image");
+
+      const response = await fetch(`/api/campaigns/${campaignId}/email-documents/replace-image`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          baseDocumentId: document.id,
+          expectedVersion: document.version,
+          assetId: asset.id,
+        }),
+      });
+      const body = await response.json().catch(() => null);
+
+      if (response.status === 409) {
+        setConflict({ latestVersion: body?.latestVersion ?? document.version });
+        return;
+      }
+      if (!response.ok) {
+        setReplaceImageError(body?.error ?? "Couldn't replace the image. Try again.");
+        return;
+      }
+
+      router.push(`/campaigns/${campaignId}/preview?version=${body.version}`);
+    } catch (err) {
+      setReplaceImageError(
+        err instanceof UploadAssetError ? err.message : "Couldn't replace the image. Try again.",
+      );
+    } finally {
+      setReplacingImage(false);
+    }
   }
 
   async function handleRegenerate(
@@ -247,6 +289,21 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
           >
             {regeneratingBlockId === "hero_image" ? "Regenerating…" : "Regenerate image description"}
           </button>
+
+          <label htmlFor="edit-replace-image">Replace image</label>
+          <input
+            accept="image/png,image/jpeg,image/gif,image/webp"
+            disabled={replacingImage}
+            id="edit-replace-image"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              if (file) void handleReplaceImage(file);
+            }}
+            type="file"
+          />
+          {replacingImage ? <p className="field-hint">Uploading and replacing image…</p> : null}
+          {replaceImageError ? <p className="form-error">{replaceImageError}</p> : null}
         </div>
       ) : null}
 
