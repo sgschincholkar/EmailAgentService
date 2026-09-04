@@ -21,9 +21,8 @@ If instructions conflict, use this priority order:
 ## Slice-Gated Work
 
 - Follow the approved implementation plan one slice at a time.
-- Slice 0 is approved and complete.
-- Current approved work is Slice 1A: App Shell, Shared Domain Schemas, and Brand Profile Flow.
-- Do not begin Slice 1B or any later slice without explicit product-owner approval.
+- Work is complete through Slice 6B: Targeted Single-Block Claude Regeneration.
+- Do not begin Slice 7 or any later slice without explicit product-owner approval.
 - Do not start a later slice or pull later-slice work forward.
 - Stop after completing each slice, report the result, and wait for explicit product-owner approval before continuing.
 - Existing wireframes are reference material only. Slice 0 defines the approved V0 interaction and visual contract.

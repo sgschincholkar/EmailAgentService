@@ -144,6 +144,48 @@ describe("EditDraftPanel", () => {
     expect((screen.getByLabelText("Subject") as HTMLInputElement).value).toBe("New subject");
   });
 
+  it("shows a regenerate button for each eligible field but not for CTA or footer", () => {
+    render(<EditDraftPanel campaignId="campaign-1" document={baseDocument} />);
+
+    expect(screen.getByRole("button", { name: "Regenerate headline" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Regenerate body" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /regenerate.*cta/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /regenerate.*footer/i })).toBeNull();
+  });
+
+  it("navigates to the new version on a successful regenerate", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ documentId: "doc-2", version: 3 }), { status: 201 }),
+      ),
+    );
+
+    render(<EditDraftPanel campaignId="campaign-1" document={baseDocument} />);
+    fireEvent.click(screen.getByRole("button", { name: "Regenerate body" }));
+
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/campaigns/campaign-1/preview?version=3"));
+  });
+
+  it("shows a regenerate error without navigating on failure", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ error: "Couldn't regenerate this block. Try again." }), {
+          status: 502,
+        }),
+      ),
+    );
+
+    render(<EditDraftPanel campaignId="campaign-1" document={baseDocument} />);
+    fireEvent.click(screen.getByRole("button", { name: "Regenerate body" }));
+
+    await waitFor(() =>
+      expect(screen.getByText("Couldn't regenerate this block. Try again.")).toBeTruthy(),
+    );
+    expect(push).not.toHaveBeenCalled();
+  });
+
   it("preserves entered values and shows a safe error on a 400 validation failure", async () => {
     vi.stubGlobal(
       "fetch",

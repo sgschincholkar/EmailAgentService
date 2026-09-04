@@ -55,6 +55,9 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
   const [conflict, setConflict] = useState<{ latestVersion: number } | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const [regeneratingBlockId, setRegeneratingBlockId] = useState<string | null>(null);
+  const [regenerateError, setRegenerateError] = useState<string | null>(null);
+
   function buildEdits() {
     const edits: Array<
       | { target: "document"; field: "subject" | "preheader"; value: string }
@@ -144,6 +147,42 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
     router.refresh();
   }
 
+  async function handleRegenerate(
+    blockId: "headline" | "body" | "event_details" | "offer_details" | "hero_image",
+  ) {
+    setRegenerateError(null);
+    setConflict(null);
+    setSuccessMessage(null);
+    setRegeneratingBlockId(blockId);
+    try {
+      const response = await fetch(`/api/campaigns/${campaignId}/email-documents/regenerate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          baseDocumentId: document.id,
+          expectedVersion: document.version,
+          blockId,
+        }),
+      });
+      const body = await response.json().catch(() => null);
+
+      if (response.status === 409) {
+        setConflict({ latestVersion: body?.latestVersion ?? document.version });
+        return;
+      }
+      if (!response.ok) {
+        setRegenerateError(body?.error ?? "Couldn't regenerate this block. Try again.");
+        return;
+      }
+
+      router.push(`/campaigns/${campaignId}/preview?version=${body.version}`);
+    } catch {
+      setRegenerateError("Couldn't regenerate this block. Try again.");
+    } finally {
+      setRegeneratingBlockId(null);
+    }
+  }
+
   return (
     <section aria-label="Edit draft" className="edit-draft-panel">
       <h2>Edit draft</h2>
@@ -167,19 +206,31 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
         />
       </div>
 
-      {textSlots.map((slot) => (
-        <div className="field" key={slot.slotId}>
-          <label htmlFor={`edit-block-${slot.slotId}`}>{slotLabel(slot.slotId)}</label>
-          <textarea
-            id={`edit-block-${slot.slotId}`}
-            onChange={(event) =>
-              setTextValues((current) => ({ ...current, [slot.slotId]: event.target.value }))
-            }
-            rows={4}
-            value={textValues[slot.slotId] ?? ""}
-          />
-        </div>
-      ))}
+      {textSlots.map((slot) => {
+        const blockId = slot.slotId as "headline" | "body" | "event_details" | "offer_details";
+        return (
+          <div className="field" key={slot.slotId}>
+            <label htmlFor={`edit-block-${slot.slotId}`}>{slotLabel(slot.slotId)}</label>
+            <textarea
+              id={`edit-block-${slot.slotId}`}
+              onChange={(event) =>
+                setTextValues((current) => ({ ...current, [slot.slotId]: event.target.value }))
+              }
+              rows={4}
+              value={textValues[slot.slotId] ?? ""}
+            />
+            <button
+              disabled={regeneratingBlockId !== null}
+              onClick={() => handleRegenerate(blockId)}
+              type="button"
+            >
+              {regeneratingBlockId === blockId
+                ? "Regenerating…"
+                : `Regenerate ${slotLabel(slot.slotId).toLowerCase()}`}
+            </button>
+          </div>
+        );
+      })}
 
       {hasImageSlot ? (
         <div className="field">
@@ -189,8 +240,17 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
             onChange={(event) => setAltText(event.target.value)}
             value={altText}
           />
+          <button
+            disabled={regeneratingBlockId !== null}
+            onClick={() => handleRegenerate("hero_image")}
+            type="button"
+          >
+            {regeneratingBlockId === "hero_image" ? "Regenerating…" : "Regenerate image description"}
+          </button>
         </div>
       ) : null}
+
+      {regenerateError ? <p className="form-error">{regenerateError}</p> : null}
 
       {ctaBlock ? (
         <div className="two-column-fields">

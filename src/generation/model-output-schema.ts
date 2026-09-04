@@ -115,3 +115,27 @@ export function buildModelOutputSchema(layoutId: LayoutId) {
     }
   });
 }
+
+const RegenerateTextBlockOutputSchema = z.object({ content: NoHtmlStringSchema }).strict();
+const RegenerateImageAltTextOutputSchema = z.object({ altText: NoHtmlStringSchema }).strict();
+
+export type RegenerateTextBlockOutput = z.infer<typeof RegenerateTextBlockOutputSchema>;
+export type RegenerateImageAltTextOutput = z.infer<typeof RegenerateImageAltTextOutputSchema>;
+
+/**
+ * Narrow output schema for a targeted single-block regeneration — either
+ * {content} for a text slot or {altText} for the image slot. Deliberately
+ * excludes every other ModelOutput field (no subject options, no CTA, no
+ * other blocks) so Claude cannot smuggle a wider rewrite through this path.
+ */
+export function buildRegenerateBlockOutputSchema(
+  blockKind: "image",
+): typeof RegenerateImageAltTextOutputSchema;
+export function buildRegenerateBlockOutputSchema(
+  blockKind: "text",
+): typeof RegenerateTextBlockOutputSchema;
+export function buildRegenerateBlockOutputSchema(blockKind: "text" | "image") {
+  return blockKind === "image"
+    ? RegenerateImageAltTextOutputSchema
+    : RegenerateTextBlockOutputSchema;
+}

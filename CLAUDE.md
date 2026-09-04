@@ -8,10 +8,8 @@ Canonical documents:
 - `docs/superpowers/specs/2026-09-01-email-agent-v0-design.md`
 - `docs/email-agent-v0-v0.5-implementation-plan.md`
 
-Slice 0 is approved and complete.
-
-Current approved work is Slice 1A: App Shell, Shared Domain Schemas, and Brand Profile Flow.
-Do not begin Slice 1B or any later slice without explicit product-owner approval.
+Work is complete through Slice 6B: Targeted Single-Block Claude Regeneration.
+Do not begin Slice 7 or any later slice without explicit product-owner approval.
 
 Core rules:
 

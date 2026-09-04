@@ -99,7 +99,10 @@ describe("campaign + segment card persistence", () => {
   });
 
   it("does not leave an orphan Segment Card when the Campaign write fails", async () => {
-    const segmentCountBefore = (await db.select().from(segmentCards)).length;
+    // Unique name scoped to this test/run — a whole-table count races
+    // against other test files' parallel inserts and deletes against the
+    // shared dev database, so identify this test's own row instead.
+    const orphanCheckSegmentName = `Orphan check segment ${crypto.randomUUID()}`;
 
     const input: CampaignFormInput = {
       brandProfileId: "00000000-0000-0000-0000-000000000000",
@@ -117,7 +120,7 @@ describe("campaign + segment card persistence", () => {
       selectedLayoutId: LayoutIdSchema.parse("text_announcement"),
       images: [],
       segmentCard: {
-        name: "Orphan check segment",
+        name: orphanCheckSegmentName,
         primaryMotivation: "N/A",
         primaryObjection: "N/A",
         desiredAction: "N/A",
@@ -126,7 +129,10 @@ describe("campaign + segment card persistence", () => {
 
     await expect(saveCampaign(input)).rejects.toThrow();
 
-    const segmentCountAfter = (await db.select().from(segmentCards)).length;
-    expect(segmentCountAfter).toBe(segmentCountBefore);
+    const orphanRows = await db
+      .select()
+      .from(segmentCards)
+      .where(eq(segmentCards.name, orphanCheckSegmentName));
+    expect(orphanRows).toHaveLength(0);
   });
 });

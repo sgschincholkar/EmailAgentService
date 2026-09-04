@@ -119,12 +119,21 @@ describe("generateCampaignEmail", () => {
   it("leaves no partial EmailDocument and sets status failed when the model output never validates", async () => {
     vi.spyOn(claudeClient, "callClaude").mockResolvedValue('{"not":"valid"}');
 
-    const beforeCount = (await db.select().from(emailDocuments)).length;
+    // Scoped to this test's own campaign, not a whole-table count — a
+    // table-wide count races against other test files' parallel inserts
+    // and deletes against the shared dev database.
+    const beforeRows = await db
+      .select()
+      .from(emailDocuments)
+      .where(eq(emailDocuments.campaignId, campaignId));
 
     await expect(generateCampaignEmail(campaignId)).rejects.toThrow(GenerationFailedError);
 
-    const afterCount = (await db.select().from(emailDocuments)).length;
-    expect(afterCount).toBe(beforeCount);
+    const afterRows = await db
+      .select()
+      .from(emailDocuments)
+      .where(eq(emailDocuments.campaignId, campaignId));
+    expect(afterRows.length).toBe(beforeRows.length);
 
     const [campaignRow] = await db
       .select()
