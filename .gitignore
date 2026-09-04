@@ -1,0 +1,11 @@
+node_modules/
+.next/
+coverage/
+.superpowers/
+*.tsbuildinfo
+.DS_Store
+.env.local
+.env*.local
+.local-assets/
+.playwright-mcp/
+

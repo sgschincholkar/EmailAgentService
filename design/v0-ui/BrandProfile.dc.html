@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js">
+</script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#e9ece8;color:#1b2825;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.page{width:1200px;min-height:1050px;background:#f7f8f5}.bar{height:68px;background:#173b3b;color:white;padding:0 34px;display:flex;align-items:center;justify-content:space-between}.steps{display:flex;gap:18px;font-size:12px;color:#aec5bf}.steps b{color:white}.wrap{padding:34px 46px 46px}.heading{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px}.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#5d7771;font-weight:700}h1{font:500 32px Georgia,serif;color:#173a36;margin:7px 0}p{margin:0;color:#697570;font-size:13px;line-height:1.5}.panel{background:white;border:1px solid #d8ded9;border-radius:14px;padding:24px;margin-bottom:16px}.panel h2{font-size:16px;margin:0 0 4px}.hint{font-size:12px;color:#76817d;margin-bottom:18px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.field label{display:flex;justify-content:space-between;font-size:12px;font-weight:650;margin-bottom:7px}.optional{font-weight:400;color:#8a9490}.input,.textarea,.upload{border:1px solid #cfd7d2;border-radius:8px;background:#fbfcfa;color:#33413d;padding:11px 12px;font-size:13px;min-height:40px}.textarea{min-height:70px}.upload{height:84px;border-style:dashed;display:flex;align-items:center;justify-content:center;gap:10px;color:#63716c}.color{display:flex;align-items:center;gap:7px}.swatch{width:28px;height:28px;border-radius:6px;border:1px solid #c9cfcb}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{border:1px solid #ccd5d0;border-radius:99px;padding:7px 11px;font-size:12px;background:#fafbf9}.chip.on{background:#dfece7;border-color:#7fa89d;color:#214943}.seg{display:flex;border:1px solid #cdd5d1;border-radius:8px;overflow:hidden;width:max-content}.seg span{padding:9px 20px;font-size:12px}.seg .on{background:#245550;color:white}.footer{display:flex;align-items:center;justify-content:space-between;padding-top:8px}.button{background:#245550;color:white;border-radius:8px;padding:11px 18px;font-size:13px;font-weight:700}.note{font-size:11px;color:#78837f}.req{color:#a84c3e}
+</style>
+<style>
+body{background:#f1efe9}.page{min-height:1060px;background:#fbfaf7}.bar{background:#fbfaf7;color:#27433e;border-bottom:1px solid #e4dfd5}.steps{color:#7a8681}.steps b{color:#27433e}.wrap{max-width:980px;margin:auto;padding:54px 58px}.heading{margin-bottom:34px}.panel{background:transparent;border:0;border-radius:0;border-bottom:1px solid #e5e0d7;margin:0;padding:28px 0}.grid5{grid-template-columns:1fr}.grid5 .field:not(:first-child){display:none}.panel:nth-of-type(3) .grid2 .field:nth-child(1),.panel:nth-of-type(3) .grid2 .field:nth-child(3),.panel:nth-of-type(3) .grid2 .field:nth-child(4){display:none}.panel:nth-of-type(4){border:1px solid #e2ddd3;border-radius:12px;background:#fff;padding:19px 21px;margin-top:24px}.panel:nth-of-type(4) .grid2{display:none}.panel:nth-of-type(4) .hint{margin:0}.footer{padding-top:28px}
+</style>
+</helmet>
+<div class="page">
+<header class="bar">
+<b>Email Agent</b>
+<div class="steps">
+<b>1&nbsp; Brand Profile</b>
+<span>2&nbsp; Campaign Setup</span>
+<span>3&nbsp; Review</span>
+</div>
+<span style="font-size:12px">Northstar Learning</span>
+</header>
+<main class="wrap">
+<div class="heading">
+<div>
+<div class="eyebrow">Step 1 of 3</div>
+<h1>Make it feel like your brand</h1>
+<p>Start with a few essentials. You can add more detail whenever it’s helpful.</p>
+</div>
+<div class="note">
+<span class="req">*</span> Required field</div>
+</div>
+<section class="panel">
+<h2>The basics</h2>
+<div class="hint">Tell us who the email is from and add your logo if you have it.</div>
+<div class="grid2">
+<div class="field">
+<label>Brand name <span class="req">*</span>
+</label>
+<div class="input">Northstar Learning</div>
+</div>
+<div class="field">
+<label>Logo upload <span class="optional">Recommended</span>
+</label>
+<div class="upload">
+<b>↑ Upload logo</b>
+<span>PNG, JPG, or SVG</span>
+</div>
+</div>
+</div>
+</section>
+<section class="panel">
+<h2>Your colors</h2>
+<div class="hint">Choose the main color readers should associate with your brand.</div>
+<div class="grid5">
+<div class="field">
+<label>Primary <span class="req">*</span>
+</label>
+<div class="input color">
+<i class="swatch" style="background:#185d65">
+</i>#185D65</div>
+</div>
+<div class="field">
+<label>Secondary <span class="optional">Optional</span>
+</label>
+<div class="input color">
+<i class="swatch" style="background:#dceeed">
+</i>#DCEEED</div>
+</div>
+<div class="field">
+<label>Accent <span class="optional">Optional</span>
+</label>
+<div class="input color">
+<i class="swatch" style="background:#dc7a45">
+</i>#DC7A45</div>
+</div>
+<div class="field">
+<label>Background <span class="optional">Optional</span>
+</label>
+<div class="input color">
+<i class="swatch" style="background:#f7f2e8">
+</i>#F7F2E8</div>
+</div>
+<div class="field">
+<label>Text <span class="optional">Optional</span>
+</label>
+<div class="input color">
+<i class="swatch" style="background:#18302f">
+</i>#18302F</div>
+</div>
+</div>
+</section>
+<section class="panel">
+<h2>Your voice</h2>
+<div class="hint">Choose at least one tone and add a note in your own words.</div>
+<div class="field" style="margin-bottom:16px">
+<label>How should it sound? <span class="req">*</span>
+</label>
+<div class="chips">
+<span class="chip on">Warm</span>
+<span class="chip on">Clear</span>
+<span class="chip">Confident</span>
+<span class="chip">Playful</span>
+<span class="chip">Editorial</span>
+<span class="chip">Direct</span>
+</div>
+</div>
+<div class="grid2">
+<div class="field">
+<label>Font preference <span class="optional">Optional</span>
+</label>
+<div class="input">Avenir Next</div>
+<div class="note" style="margin-top:5px">Use your preferred font as a visual reference. We’ll keep the email readable across inboxes.</div>
+</div>
+<div class="field">
+<label>Voice notes <span class="optional">Optional</span>
+</label>
+<div class="textarea">Helpful and assured. Use short sentences. Avoid hype.</div>
+</div>
+<div class="field">
+<label>Words to use <span class="optional">Optional</span>
+</label>
+<div class="input">learning path, practical, guided</div>
+</div>
+<div class="field">
+<label>Words to avoid <span class="optional">Optional</span>
+</label>
+<div class="input">revolutionary, guaranteed, effortless</div>
+<div class="note" style="margin-top:5px">We’ll point these out gently if they appear in a draft.</div>
+</div>
+</div>
+</section>
+<section class="panel">
+<h2>Add more brand details &nbsp;⌄</h2>
+<div class="hint">Optional colors, font preference, words to use or avoid, button style, and email footer.</div>
+<div class="grid2">
+<div class="field">
+<label>Button style <span class="req">*</span>
+</label>
+<div class="seg">
+<span class="on">Filled</span>
+<span>Outline</span>
+</div>
+</div>
+<div class="field">
+<label>Email footer <span class="req">*</span>
+</label>
+<div class="textarea">Northstar Learning · 14 Willow Street, Portland, OR<br>Manage preferences or unsubscribe.</div>
+</div>
+</div>
+</section>
+<div class="footer">
+<span class="note">You can update these details later.</span>
+<span class="button">Save and continue →</span>
+</div>
+</main>
+</div>
+</x-dc>
+</body>
+</html>

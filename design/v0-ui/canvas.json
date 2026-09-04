@@ -1,6 +1,10 @@
 {
   "artboards": [
-    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 520, "h": 760, "is_interactive": true }
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1200, "h": 800, "is_interactive": false },
+    { "file": "BrandProfile.dc.html", "x": 1280, "y": 0, "w": 1200, "h": 1240, "is_interactive": false },
+    { "file": "CampaignSetup.dc.html", "x": 0, "y": 1360, "w": 1280, "h": 1740, "is_interactive": false },
+    { "file": "Preview.dc.html", "x": 1360, "y": 1360, "w": 1280, "h": 960, "is_interactive": false },
+    { "file": "States.dc.html", "x": 1360, "y": 2400, "w": 1280, "h": 960, "is_interactive": false }
   ],
   "launch": { "view": "focused", "file": "Main.dc.html" }
 }
