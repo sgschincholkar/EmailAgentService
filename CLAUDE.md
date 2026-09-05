@@ -8,8 +8,18 @@ Canonical documents:
 - `docs/superpowers/specs/2026-09-01-email-agent-v0-design.md`
 - `docs/email-agent-v0-v0.5-implementation-plan.md`
 
-Work is complete through Slice 6B: Targeted Single-Block Claude Regeneration.
-Do not begin Slice 7 or any later slice without explicit product-owner approval.
+Work is complete through:
+- Slice 6B: Targeted Single-Block Claude Regeneration
+- Slice 6 evaluation: fixture matrix, real-Claude quality gate, results doc
+- V0.5 image replacement (hero_image asset swap, new immutable version)
+- V0.5 manual layout switching (switch among the 4 fixed layouts, block-id
+  mapping, no invented content, no Claude call)
+- UI/UX accessibility pass (focus management, ARIA wiring, version-state
+  badges, redirect-surviving status banners, tap-target fixes)
+
+Do not begin PDF export, plain-text download, Resend/test send, Brevo,
+public storage, analytics, variants, or any other later-scope work without
+explicit product-owner approval.
 
 Core rules:
 
