@@ -15,7 +15,7 @@ const SegmentCardInputSchema = z.object({
   primaryMotivation: NonEmptyStringSchema,
   primaryObjection: NonEmptyStringSchema,
   desiredAction: NonEmptyStringSchema,
-  messagingNotes: NonEmptyStringSchema.optional(),
+  messagingNotes: z.string().optional(),
 });
 
 const CampaignImageInputSchema = z.object({

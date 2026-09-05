@@ -86,6 +86,7 @@ export function CampaignImagesField({
             />
             <button
               aria-label="Remove image"
+              className="compact-control"
               onClick={() => removeImage(entry.assetId)}
               type="button"
             >
@@ -97,7 +98,9 @@ export function CampaignImagesField({
 
       {value.length < MAX_IMAGES ? (
         <button
+          className="compact-control"
           disabled={uploading}
+          id="campaign-images-upload"
           onClick={() => inputRef.current?.click()}
           type="button"
         >

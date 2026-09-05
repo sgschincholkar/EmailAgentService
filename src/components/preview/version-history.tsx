@@ -39,7 +39,7 @@ export function VersionHistory({
         return;
       }
 
-      router.push(`/campaigns/${campaignId}/preview?version=${body.version}`);
+      router.push(`/campaigns/${campaignId}/preview?version=${body.version}&created=1`);
     } catch {
       setRestoreError("Couldn't restore this version. Try again.");
     } finally {
@@ -63,6 +63,9 @@ export function VersionHistory({
               <div>
                 <span className="version-number">Version {version.version}</span>
                 {isLatest ? <span className="version-badge">Current</span> : null}
+                {isDisplayed && !isLatest ? (
+                  <span className="version-badge version-badge-viewing">Viewing</span>
+                ) : null}
                 <p className="field-hint">{new Date(version.createdAt).toLocaleString()}</p>
               </div>
               <div className="version-actions">
@@ -74,6 +77,7 @@ export function VersionHistory({
                 </Link>
                 {!isLatest ? (
                   <button
+                    className="compact-control"
                     disabled={restoringId === version.id}
                     onClick={() => handleRestore(version.id)}
                     type="button"

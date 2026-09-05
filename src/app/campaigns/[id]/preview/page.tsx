@@ -8,6 +8,7 @@ import {
   listEmailDocumentVersions,
 } from "@/app/campaigns/actions";
 import { EditDraftPanel } from "@/components/preview/edit-draft-panel";
+import { LayoutSwitchPanel } from "@/components/preview/layout-switch-panel";
 import { PreviewShell } from "@/components/preview/preview-shell";
 import { QuickChecks } from "@/components/preview/quick-checks";
 import { VersionHistory } from "@/components/preview/version-history";
@@ -30,7 +31,8 @@ export default async function CampaignPreviewPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { id } = await params;
-  const { version: versionParam } = await searchParams;
+  const { version: versionParam, created: createdParam } = await searchParams;
+  const wasJustCreated = createdParam === "1";
   const campaign = await getCampaignById(id);
 
   if (!campaign) {
@@ -104,8 +106,14 @@ export default async function CampaignPreviewPage({
         </Link>
       </header>
 
+      {wasJustCreated ? (
+        <p className="status-banner" role="status">
+          Saved as version {document.version}.
+        </p>
+      ) : null}
+
       {!isLatest ? (
-        <p className="field-hint">
+        <p className="status-banner status-banner-muted" role="status">
           Viewing version {document.version} (read-only). Restore it to make edits.
         </p>
       ) : null}
@@ -129,6 +137,8 @@ export default async function CampaignPreviewPage({
       <QuickChecks validationResults={document.validationResults} />
 
       {isLatest ? <EditDraftPanel campaignId={campaign.id} document={document} /> : null}
+
+      {isLatest ? <LayoutSwitchPanel campaignId={campaign.id} document={document} /> : null}
 
       <VersionHistory
         campaignId={campaign.id}

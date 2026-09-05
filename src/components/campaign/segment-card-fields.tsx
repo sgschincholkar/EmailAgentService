@@ -45,12 +45,18 @@ export function SegmentCardFields({
       <div className="field">
         <label htmlFor="segment-name">Give this audience a name</label>
         <input
+          aria-describedby={errors?.name ? "segment-name-error" : undefined}
+          aria-invalid={Boolean(errors?.name)}
           id="segment-name"
           onChange={(event) => set("name", event.target.value)}
           placeholder="For example: Lapsed trial users"
           value={value.name}
         />
-        {errors?.name ? <p className="field-error">{errors.name}</p> : null}
+        {errors?.name ? (
+          <p className="field-error" id="segment-name-error">
+            {errors.name}
+          </p>
+        ) : null}
       </div>
 
       <div className="field">
@@ -74,6 +80,8 @@ export function SegmentCardFields({
       <div className="field">
         <label htmlFor="segment-motivation">What matters most to them?</label>
         <textarea
+          aria-describedby={errors?.primaryMotivation ? "segment-motivation-error" : undefined}
+          aria-invalid={Boolean(errors?.primaryMotivation)}
           id="segment-motivation"
           onChange={(event) => set("primaryMotivation", event.target.value)}
           placeholder="For example: Getting their team onboarded quickly"
@@ -81,13 +89,17 @@ export function SegmentCardFields({
           value={value.primaryMotivation}
         />
         {errors?.primaryMotivation ? (
-          <p className="field-error">{errors.primaryMotivation}</p>
+          <p className="field-error" id="segment-motivation-error">
+            {errors.primaryMotivation}
+          </p>
         ) : null}
       </div>
 
       <div className="field">
         <label htmlFor="segment-objection">What might hold them back?</label>
         <textarea
+          aria-describedby={errors?.primaryObjection ? "segment-objection-error" : undefined}
+          aria-invalid={Boolean(errors?.primaryObjection)}
           id="segment-objection"
           onChange={(event) => set("primaryObjection", event.target.value)}
           placeholder="For example: Worried it will take too long to set up"
@@ -95,20 +107,26 @@ export function SegmentCardFields({
           value={value.primaryObjection}
         />
         {errors?.primaryObjection ? (
-          <p className="field-error">{errors.primaryObjection}</p>
+          <p className="field-error" id="segment-objection-error">
+            {errors.primaryObjection}
+          </p>
         ) : null}
       </div>
 
       <div className="field">
         <label htmlFor="segment-action">What do you want them to do?</label>
         <input
+          aria-describedby={errors?.desiredAction ? "segment-action-error" : undefined}
+          aria-invalid={Boolean(errors?.desiredAction)}
           id="segment-action"
           onChange={(event) => set("desiredAction", event.target.value)}
           placeholder="For example: Finish setting up their workspace"
           value={value.desiredAction}
         />
         {errors?.desiredAction ? (
-          <p className="field-error">{errors.desiredAction}</p>
+          <p className="field-error" id="segment-action-error">
+            {errors.desiredAction}
+          </p>
         ) : null}
       </div>
 

@@ -75,6 +75,29 @@ export function runValidations(params: {
     );
   }
 
+  const requiredNonImageSlots = layoutSlots.filter(
+    (slot) => slot.required && slot.kind !== "image",
+  );
+  for (const slot of requiredNonImageSlots) {
+    const block = document.blocks.find((candidate) => candidate.id === slot.slotId);
+    const hasContent = Boolean(
+      block &&
+        ((block.type === "text" && block.content.trim().length > 0) ||
+          (block.type === "headline" && block.content.trim().length > 0) ||
+          (block.type === "button" && block.label.trim().length > 0)),
+    );
+    if (!hasContent) {
+      results.push(
+        result(
+          "error",
+          "missing_required_fact",
+          `This layout requires content for "${slot.slotId}", but it's missing.`,
+          { blockId: slot.slotId, suggestedAction: "Add this content before exporting." },
+        ),
+      );
+    }
+  }
+
   const footerBlock = document.blocks.find((block) => block.type === "footer");
   if (!footerBlock) {
     results.push(result("warning", "missing_footer", "No footer content was applied."));

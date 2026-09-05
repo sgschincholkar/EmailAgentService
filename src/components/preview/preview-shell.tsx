@@ -54,7 +54,7 @@ export function PreviewShell({
   return (
     <div className="preview-shell">
       <div className="preview-toolbar">
-        <div className="preview-mode-toggle" role="radiogroup" aria-label="Preview width">
+        <div className="preview-mode-toggle" aria-label="Preview width">
           <button
             aria-pressed={viewMode === "desktop"}
             className={viewMode === "desktop" ? "selected" : ""}
@@ -89,7 +89,11 @@ export function PreviewShell({
       ) : null}
       {downloadError ? <p className="form-error">{downloadError}</p> : null}
 
-      <div className={`email-frame-container email-frame-${viewMode}`}>
+      <div
+        aria-label={`Email preview, version ${documentVersion}`}
+        className={`email-frame-container email-frame-${viewMode}`}
+        role="region"
+      >
         <iframe
           className="email-frame"
           sandbox=""

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 
 import { incompatibleFactKeysOnTypeChange } from "@/domain/campaign-facts";
 import type { CampaignWithSegment } from "@/app/campaigns/actions";
@@ -24,6 +24,18 @@ import { SegmentCardFields, type SegmentCardFormValues } from "./segment-card-fi
 type CampaignWithSegmentLike = CampaignWithSegment | undefined;
 
 const IMAGE_REQUIRED_LAYOUTS: LayoutId[] = ["hero_cta", "promotion_offer"];
+
+/**
+ * Optional free-text fields (e.g. segment messaging notes) are stored as
+ * `undefined` when empty — the schema requires optional strings to be
+ * either absent or non-empty after trimming, never `""`. Centralized here
+ * so every optional-field call site converts blank input the same way,
+ * instead of relying on an inline `.trim() || undefined` at each site.
+ */
+function blankToUndefined(value: string): string | undefined {
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
 
 type CampaignFormProps = {
   brandProfiles: BrandProfile[];
@@ -124,6 +136,25 @@ type FormErrors = Partial<
   >
 >;
 
+/**
+ * Maps each FormErrors key to the id of the field it belongs to, in the
+ * same top-to-bottom order the fields appear in the form. Used to focus
+ * the first invalid field after a failed submit and to build the
+ * error-summary's jump links — kept as one ordered list so both stay in
+ * sync with the actual visual order without duplicating it.
+ */
+const FIELD_ERROR_ORDER: Array<{ key: keyof FormErrors; fieldId: string; label: string }> = [
+  { key: "name", fieldId: "campaign-name", label: "Campaign name" },
+  { key: "brief", fieldId: "campaign-brief", label: "Campaign brief" },
+  { key: "ctaLabel", fieldId: "cta-label", label: "Button label" },
+  { key: "ctaUrl", fieldId: "cta-url", label: "Button destination URL" },
+  { key: "images", fieldId: "campaign-images-upload", label: "Campaign images" },
+  { key: "segmentName", fieldId: "segment-name", label: "Audience name" },
+  { key: "segmentMotivation", fieldId: "segment-motivation", label: "Audience motivation" },
+  { key: "segmentObjection", fieldId: "segment-objection", label: "Audience objection" },
+  { key: "segmentAction", fieldId: "segment-action", label: "Desired action" },
+];
+
 export function CampaignForm({
   brandProfiles,
   initialCampaign,
@@ -164,10 +195,22 @@ export function CampaignForm({
   const [errors, setErrors] = useState<FormErrors>({});
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const [pendingTypeChange, setPendingTypeChange] = useState<{
     nextType: CampaignType;
     droppedKeys: string[];
   } | null>(null);
+
+  function focusField(fieldId: string) {
+    const field = formRef.current?.querySelector<HTMLElement>(`#${fieldId}`);
+    field?.focus();
+  }
+
+  function focusFirstInvalidField(nextErrors: FormErrors) {
+    const firstError = FIELD_ERROR_ORDER.find((entry) => nextErrors[entry.key]);
+    if (!firstError) return;
+    focusField(firstError.fieldId);
+  }
 
   function applyTypeChange(nextType: CampaignType) {
     const droppedKeys = incompatibleFactKeysOnTypeChange(
@@ -220,6 +263,7 @@ export function CampaignForm({
 
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
+      focusFirstInvalidField(nextErrors);
       return;
     }
 
@@ -272,7 +316,7 @@ export function CampaignForm({
         primaryMotivation: segment.primaryMotivation.trim(),
         primaryObjection: segment.primaryObjection.trim(),
         desiredAction: segment.desiredAction.trim(),
-        messagingNotes: segment.messagingNotes.trim() || undefined,
+        messagingNotes: blankToUndefined(segment.messagingNotes),
       },
     };
 
@@ -298,12 +342,33 @@ export function CampaignForm({
 
   const missingFactWarnings = getMissingFactWarnings(campaignType, facts);
 
+  const activeFieldErrors = FIELD_ERROR_ORDER.filter((entry) => errors[entry.key]);
+
   return (
-    <form className="campaign-form" noValidate onSubmit={handleSubmit}>
+    <form className="campaign-form" noValidate onSubmit={handleSubmit} ref={formRef}>
       <div className="form-intro">
         <p className="eyebrow">Campaign setup</p>
         <h1>Tell us about your campaign</h1>
       </div>
+
+      {activeFieldErrors.length > 0 ? (
+        <div className="form-error-summary" role="alert">
+          <p>Check the highlighted fields before saving:</p>
+          <ul>
+            {activeFieldErrors.map((entry) => (
+              <li key={entry.key}>
+                <button
+                  className="text-link"
+                  onClick={() => focusField(entry.fieldId)}
+                  type="button"
+                >
+                  {entry.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <div className="field">
         <label htmlFor="brand-profile">Brand profile</label>
@@ -323,13 +388,18 @@ export function CampaignForm({
       <div className="field">
         <label htmlFor="campaign-name">What are you sending?</label>
         <input
+          aria-describedby={errors.name ? "campaign-name-error" : undefined}
           aria-invalid={Boolean(errors.name)}
           id="campaign-name"
           onChange={(event) => setName(event.target.value)}
           placeholder="For example: Spring feature launch"
           value={name}
         />
-        {errors.name ? <p className="field-error">{errors.name}</p> : null}
+        {errors.name ? (
+          <p className="field-error" id="campaign-name-error">
+            {errors.name}
+          </p>
+        ) : null}
       </div>
 
       <div className="field">
@@ -367,35 +437,53 @@ export function CampaignForm({
       <div className="field">
         <label htmlFor="campaign-brief">Tell us about this campaign</label>
         <textarea
+          aria-describedby={errors.brief ? "campaign-brief-error" : undefined}
+          aria-invalid={Boolean(errors.brief)}
           id="campaign-brief"
           onChange={(event) => setBrief(event.target.value)}
           placeholder="Give a short brief. What's happening, and why should this audience care?"
           rows={4}
           value={brief}
         />
-        {errors.brief ? <p className="field-error">{errors.brief}</p> : null}
+        {errors.brief ? (
+          <p className="field-error" id="campaign-brief-error">
+            {errors.brief}
+          </p>
+        ) : null}
       </div>
 
       <div className="two-column-fields">
         <div className="field">
           <label htmlFor="cta-label">What should people do next?</label>
           <input
+            aria-describedby={errors.ctaLabel ? "cta-label-error" : undefined}
+            aria-invalid={Boolean(errors.ctaLabel)}
             id="cta-label"
             onChange={(event) => setCtaLabel(event.target.value)}
             placeholder="For example: Try it now"
             value={ctaLabel}
           />
-          {errors.ctaLabel ? <p className="field-error">{errors.ctaLabel}</p> : null}
+          {errors.ctaLabel ? (
+            <p className="field-error" id="cta-label-error">
+              {errors.ctaLabel}
+            </p>
+          ) : null}
         </div>
         <div className="field">
           <label htmlFor="cta-url">Where should the button take them?</label>
           <input
+            aria-describedby={errors.ctaUrl ? "cta-url-error" : undefined}
+            aria-invalid={Boolean(errors.ctaUrl)}
             id="cta-url"
             onChange={(event) => setCtaUrl(event.target.value)}
             placeholder="https://example.com"
             value={ctaUrl}
           />
-          {errors.ctaUrl ? <p className="field-error">{errors.ctaUrl}</p> : null}
+          {errors.ctaUrl ? (
+            <p className="field-error" id="cta-url-error">
+              {errors.ctaUrl}
+            </p>
+          ) : null}
         </div>
       </div>
 

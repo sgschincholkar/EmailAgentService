@@ -54,7 +54,6 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [conflict, setConflict] = useState<{ latestVersion: number } | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [regeneratingBlockId, setRegeneratingBlockId] = useState<string | null>(null);
   const [regenerateError, setRegenerateError] = useState<string | null>(null);
@@ -114,7 +113,6 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
 
     setError(null);
     setConflict(null);
-    setSuccessMessage(null);
     setSaving(true);
     try {
       const response = await fetch(`/api/campaigns/${campaignId}/email-documents/edit`, {
@@ -137,8 +135,7 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
         return;
       }
 
-      setSuccessMessage(`Saved as version ${body.version}.`);
-      router.push(`/campaigns/${campaignId}/preview?version=${body.version}`);
+      router.push(`/campaigns/${campaignId}/preview?version=${body.version}&created=1`);
     } catch {
       setError("Couldn't save this edit. Try again.");
     } finally {
@@ -154,7 +151,6 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
   async function handleReplaceImage(file: File) {
     setReplaceImageError(null);
     setConflict(null);
-    setSuccessMessage(null);
     setReplacingImage(true);
     try {
       const asset = await uploadAsset(file, "campaign_image");
@@ -179,7 +175,7 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
         return;
       }
 
-      router.push(`/campaigns/${campaignId}/preview?version=${body.version}`);
+      router.push(`/campaigns/${campaignId}/preview?version=${body.version}&created=1`);
     } catch (err) {
       setReplaceImageError(
         err instanceof UploadAssetError ? err.message : "Couldn't replace the image. Try again.",
@@ -194,7 +190,6 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
   ) {
     setRegenerateError(null);
     setConflict(null);
-    setSuccessMessage(null);
     setRegeneratingBlockId(blockId);
     try {
       const response = await fetch(`/api/campaigns/${campaignId}/email-documents/regenerate`, {
@@ -217,7 +212,7 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
         return;
       }
 
-      router.push(`/campaigns/${campaignId}/preview?version=${body.version}`);
+      router.push(`/campaigns/${campaignId}/preview?version=${body.version}&created=1`);
     } catch {
       setRegenerateError("Couldn't regenerate this block. Try again.");
     } finally {
@@ -262,6 +257,7 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
               value={textValues[slot.slotId] ?? ""}
             />
             <button
+              className="compact-control"
               disabled={regeneratingBlockId !== null}
               onClick={() => handleRegenerate(blockId)}
               type="button"
@@ -283,6 +279,7 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
             value={altText}
           />
           <button
+            className="compact-control"
             disabled={regeneratingBlockId !== null}
             onClick={() => handleRegenerate("hero_image")}
             type="button"
@@ -332,7 +329,6 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
       ) : null}
 
       {error ? <p className="form-error">{error}</p> : null}
-      {successMessage ? <p className="field-hint">{successMessage}</p> : null}
 
       {conflict ? (
         <div className="form-error">
@@ -340,7 +336,7 @@ export function EditDraftPanel({ campaignId, document }: EditDraftPanelProps) {
             A newer version (v{conflict.latestVersion}) already exists. Your edits here are
             still filled in, but they were saved from an older version.
           </p>
-          <button onClick={handleReloadLatest} type="button">
+          <button className="compact-control" onClick={handleReloadLatest} type="button">
             Reload latest version
           </button>
         </div>

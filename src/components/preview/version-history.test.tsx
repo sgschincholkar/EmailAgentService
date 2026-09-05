@@ -67,7 +67,41 @@ describe("VersionHistory", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Restore as new version" }));
 
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/campaigns/campaign-1/preview?version=3"));
+    await waitFor(() =>
+      expect(push).toHaveBeenCalledWith("/campaigns/campaign-1/preview?version=3&created=1"),
+    );
+  });
+
+  it("shows a Viewing badge on a displayed historical version, distinct from Current", () => {
+    render(
+      <VersionHistory
+        campaignId="campaign-1"
+        displayedVersion={1}
+        latestVersion={2}
+        versions={versions}
+      />,
+    );
+
+    expect(screen.getByText("Viewing")).toBeTruthy();
+    expect(screen.getByText("Current")).toBeTruthy();
+
+    const entries = screen.getAllByRole("listitem");
+    const viewedEntry = entries.find((entry) => entry.textContent?.includes("Version 1"));
+    expect(viewedEntry?.textContent).toContain("Viewing");
+    expect(viewedEntry?.textContent).not.toContain("Current");
+  });
+
+  it("does not show a Viewing badge when the displayed version is also the latest", () => {
+    render(
+      <VersionHistory
+        campaignId="campaign-1"
+        displayedVersion={2}
+        latestVersion={2}
+        versions={versions}
+      />,
+    );
+
+    expect(screen.queryByText("Viewing")).toBeNull();
   });
 
   it("shows an error message when restore fails", async () => {

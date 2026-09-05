@@ -153,6 +153,31 @@ describe("PreviewShell", () => {
     expect(revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
   });
 
+  it("does not use mismatched radiogroup semantics on the width toggle", () => {
+    render(
+      <PreviewShell
+        campaignName="Spring Launch"
+        documentVersion={1}
+        plainText={plainText}
+        renderedHtml={renderedHtml}
+      />,
+    );
+    expect(screen.queryByRole("radiogroup")).toBeNull();
+    expect(screen.queryByRole("radio")).toBeNull();
+  });
+
+  it("labels the preview region with the current version", () => {
+    render(
+      <PreviewShell
+        campaignName="Spring Launch"
+        documentVersion={4}
+        plainText={plainText}
+        renderedHtml={renderedHtml}
+      />,
+    );
+    expect(screen.getByRole("region", { name: "Email preview, version 4" })).toBeTruthy();
+  });
+
   it("reads the exact persisted plainText in the plain-text disclosure, preserving whitespace", () => {
     render(
       <PreviewShell

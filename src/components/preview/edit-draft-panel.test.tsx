@@ -149,7 +149,7 @@ describe("EditDraftPanel", () => {
     fireEvent.change(screen.getByLabelText("Subject"), { target: { value: "New subject" } });
     fireEvent.click(screen.getByRole("button", { name: "Save edit" }));
 
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/campaigns/campaign-1/preview?version=3"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/campaigns/campaign-1/preview?version=3&created=1"));
   });
 
   it("shows a conflict message and reload-latest action on 409", async () => {
@@ -192,7 +192,7 @@ describe("EditDraftPanel", () => {
     render(<EditDraftPanel campaignId="campaign-1" document={baseDocument} />);
     fireEvent.click(screen.getByRole("button", { name: "Regenerate body" }));
 
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/campaigns/campaign-1/preview?version=3"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/campaigns/campaign-1/preview?version=3&created=1"));
   });
 
   it("shows a regenerate error without navigating on failure", async () => {
@@ -262,7 +262,7 @@ describe("EditDraftPanel", () => {
     const file = new File(["fake"], "new-hero.png", { type: "image/png" });
     fireEvent.change(screen.getByLabelText("Replace image"), { target: { files: [file] } });
 
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/campaigns/campaign-1/preview?version=3"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/campaigns/campaign-1/preview?version=3&created=1"));
     expect(uploadAssetMock).toHaveBeenCalledWith(file, "campaign_image");
   });
 

@@ -104,4 +104,196 @@ describe("CampaignForm", () => {
       screen.queryByText("Upload at least one image for this layout."),
     ).toBeNull();
   });
+
+  it("focuses the first invalid field after a failed submit", () => {
+    render(<CampaignForm brandProfiles={[brandProfile]} onSave={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Save campaign" }));
+
+    expect(document.activeElement).toBe(screen.getByLabelText("What are you sending?"));
+  });
+
+  it("focuses the second field when only later fields are invalid", () => {
+    render(<CampaignForm brandProfiles={[brandProfile]} onSave={vi.fn()} />);
+
+    fireEvent.change(screen.getByLabelText("What are you sending?"), {
+      target: { value: "Spring launch" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save campaign" }));
+
+    expect(document.activeElement).toBe(
+      screen.getByLabelText("Tell us about this campaign"),
+    );
+  });
+
+  it("shows an actionable role=alert error summary that jumps focus to the chosen field", () => {
+    render(<CampaignForm brandProfiles={[brandProfile]} onSave={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Save campaign" }));
+
+    const summary = screen.getByRole("alert");
+    expect(summary.textContent).toContain("Check the highlighted fields before saving");
+
+    fireEvent.click(screen.getByRole("button", { name: "Button label" }));
+    expect(document.activeElement).toBe(screen.getByLabelText("What should people do next?"));
+  });
+
+  it("links each invalid field to its error message via aria-invalid and aria-describedby", () => {
+    render(<CampaignForm brandProfiles={[brandProfile]} onSave={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Save campaign" }));
+
+    const nameField = screen.getByLabelText("What are you sending?");
+    expect(nameField.getAttribute("aria-invalid")).toBe("true");
+    const describedBy = nameField.getAttribute("aria-describedby");
+    expect(describedBy).toBeTruthy();
+    expect(document.getElementById(describedBy as string)?.textContent).toBe(
+      "Name this campaign.",
+    );
+  });
+
+  it("does not mark valid fields as invalid", () => {
+    render(<CampaignForm brandProfiles={[brandProfile]} onSave={vi.fn()} />);
+
+    fireEvent.change(screen.getByLabelText("What are you sending?"), {
+      target: { value: "Spring launch" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save campaign" }));
+
+    expect(screen.getByLabelText("What are you sending?").getAttribute("aria-invalid")).toBe(
+      "false",
+    );
+  });
+
+  function fillAllRequiredFields() {
+    fireEvent.click(screen.getByRole("radio", { name: "Simple announcement" }));
+    fireEvent.change(screen.getByLabelText("What are you sending?"), {
+      target: { value: "Spring launch" },
+    });
+    fireEvent.change(screen.getByLabelText("Tell us about this campaign"), {
+      target: { value: "A short brief." },
+    });
+    fireEvent.change(screen.getByLabelText("What should people do next?"), {
+      target: { value: "Try it now" },
+    });
+    fireEvent.change(screen.getByLabelText("Where should the button take them?"), {
+      target: { value: "https://example.com" },
+    });
+    fireEvent.change(screen.getByLabelText("Give this audience a name"), {
+      target: { value: "Lapsed trial users" },
+    });
+    fireEvent.change(screen.getByLabelText("What matters most to them?"), {
+      target: { value: "Getting value quickly" },
+    });
+    fireEvent.change(screen.getByLabelText("What might hold them back?"), {
+      target: { value: "Not enough time" },
+    });
+    fireEvent.change(screen.getByLabelText("What do you want them to do?"), {
+      target: { value: "Finish setup" },
+    });
+  }
+
+  it("saves successfully with the optional messaging notes field left blank", () => {
+    const onSave = vi.fn();
+    render(<CampaignForm brandProfiles={[brandProfile]} onSave={onSave} />);
+
+    fillAllRequiredFields();
+    // Messaging notes deliberately left untouched — still empty.
+    fireEvent.click(screen.getByRole("button", { name: "Save campaign" }));
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    const submitted = onSave.mock.calls[0][0];
+    expect(submitted.segmentCard.messagingNotes).toBeUndefined();
+  });
+
+  it("saves successfully when messaging notes is typed then fully cleared", () => {
+    const onSave = vi.fn();
+    render(<CampaignForm brandProfiles={[brandProfile]} onSave={onSave} />);
+
+    fillAllRequiredFields();
+    const notesField = screen.getByLabelText("Anything else about this audience?");
+    fireEvent.change(notesField, { target: { value: "Some notes" } });
+    fireEvent.change(notesField, { target: { value: "" } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Save campaign" }));
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    const submitted = onSave.mock.calls[0][0];
+    expect(submitted.segmentCard.messagingNotes).toBeUndefined();
+  });
+
+  it("saves successfully when messaging notes contains only whitespace", () => {
+    const onSave = vi.fn();
+    render(<CampaignForm brandProfiles={[brandProfile]} onSave={onSave} />);
+
+    fillAllRequiredFields();
+    fireEvent.change(screen.getByLabelText("Anything else about this audience?"), {
+      target: { value: "   " },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Save campaign" }));
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    const submitted = onSave.mock.calls[0][0];
+    expect(submitted.segmentCard.messagingNotes).toBeUndefined();
+  });
+
+  it("preserves trimmed messaging notes content when non-empty", () => {
+    const onSave = vi.fn();
+    render(<CampaignForm brandProfiles={[brandProfile]} onSave={onSave} />);
+
+    fillAllRequiredFields();
+    fireEvent.change(screen.getByLabelText("Anything else about this audience?"), {
+      target: { value: "  Keep this tone casual.  " },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Save campaign" }));
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    const submitted = onSave.mock.calls[0][0];
+    expect(submitted.segmentCard.messagingNotes).toBe("Keep this tone casual.");
+  });
+
+  it("never applies invalid ARIA wiring to the optional messaging notes field, blank or not", () => {
+    render(<CampaignForm brandProfiles={[brandProfile]} onSave={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Save campaign" }));
+
+    const notesField = screen.getByLabelText("Anything else about this audience?");
+    expect(notesField.getAttribute("aria-invalid")).toBeNull();
+    expect(notesField.getAttribute("aria-describedby")).toBeNull();
+  });
+
+  it("never includes messaging notes in the error summary, even when other required fields are missing", () => {
+    render(<CampaignForm brandProfiles={[brandProfile]} onSave={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Save campaign" }));
+
+    const summary = screen.getByRole("alert");
+    expect(summary.textContent).not.toMatch(/messaging notes/i);
+    expect(summary.textContent).not.toMatch(/anything else/i);
+  });
+
+  it("still shows the full error summary, field error, and focus behavior for a genuinely missing required field", () => {
+    const onSave = vi.fn();
+    render(<CampaignForm brandProfiles={[brandProfile]} onSave={onSave} />);
+
+    fillAllRequiredFields();
+    // Clear one required field back out after filling the rest.
+    fireEvent.change(screen.getByLabelText("Give this audience a name"), {
+      target: { value: "" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Save campaign" }));
+
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.getByText("Give this audience a name.")).toBeTruthy();
+    const summary = screen.getByRole("alert");
+    expect(summary.textContent).toContain("Audience name");
+
+    const nameField = screen.getByLabelText("Give this audience a name");
+    expect(document.activeElement).toBe(nameField);
+    expect(nameField.getAttribute("aria-invalid")).toBe("true");
+    expect(nameField.getAttribute("aria-describedby")).toBeTruthy();
+  });
 });
