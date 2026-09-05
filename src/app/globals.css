@@ -77,11 +77,24 @@ textarea {
   text-decoration: none;
 }
 
+.primary-nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
 .nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--muted);
   font-size: 0.92rem;
   font-weight: 700;
   text-decoration: none;
+}
+
+.nav-link[aria-current="page"] {
+  color: var(--accent-dark);
 }
 
 .page-shell {
@@ -198,6 +211,76 @@ textarea {
 .profile-card p {
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.campaign-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.campaign-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+}
+
+.campaign-card:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.campaign-card > div:first-child {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.campaign-card h2 {
+  margin: 0;
+  font-size: 1.06rem;
+}
+
+.campaign-card .eyebrow {
+  margin-bottom: 4px;
+}
+
+.status-badge {
+  flex: 0 0 auto;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.status-draft {
+  color: var(--muted);
+  background: var(--canvas);
+}
+
+.status-generating {
+  color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.status-generated {
+  color: var(--accent-dark);
+  background: var(--accent-soft);
+}
+
+.status-failed {
+  color: var(--danger);
+  background: var(--danger-soft);
 }
 
 .color-dot,
@@ -692,7 +775,15 @@ textarea {
 
 @media (max-width: 640px) {
   .app-header {
+    flex-wrap: wrap;
+    height: auto;
     min-height: 64px;
+    padding: 12px 20px;
+    gap: 8px 16px;
+  }
+
+  .primary-nav {
+    gap: 20px;
   }
 
   .page-shell {
@@ -718,5 +809,11 @@ textarea {
   .upload-placeholder {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .campaign-card {
+    grid-template-columns: 1fr;
+    justify-items: start;
+    gap: 10px;
   }
 }

@@ -9,4 +9,6 @@ coverage/
 .local-assets/
 .playwright-mcp/
 .eval-slice-6-run.json
+.cursor/
+scripts/tmp-*.ts
 
